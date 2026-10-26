@@ -1,0 +1,411 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Vision AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f7fa;
+            color: #222;
+        }
+
+        h1 { margin-bottom: 8px; }
+        .subtitle { color: #666; margin-bottom: 25px; }
+
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        input[type="file"],
+        input[type="text"],
+        button {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        #preview,
+        #annotatedImage {
+            max-width: 100%;
+            max-height: 500px;
+            margin-top: 15px;
+            border-radius: 10px;
+        }
+
+        #preview { display: none; }
+        #annotatedImage { display: none; }
+
+        #loading {
+            display: none;
+            color: #2563eb;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .result-section {
+            margin-top: 20px;
+        }
+
+        .result-section h3 {
+            margin-bottom: 6px;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Computer Vision AI</h1>
+    <p class="subtitle">
+        Upload an image and let the Vision Assistant understand it.
+    </p>
+
+    <div class="panel">
+        <h2>Analyze Image</h2>
+
+        <input
+            type="file"
+            id="imageInput"
+            accept="image/*"
+        >
+
+        <img id="preview" alt="Selected image preview">
+
+        <input
+            type="text"
+            id="questionInput"
+            placeholder="Ask a question about the image (optional)"
+        >
+
+        <button id="analyzeButton">
+            Analyze Image
+        </button>
+
+        <div id="loading">
+            Analyzing image... Please wait.
+        </div>
+    </div>
+
+    <div class="panel" id="resultsPanel" style="display:none;">
+
+        <h2>Vision Results</h2>
+
+        <div class="result-section">
+            <h3>AI Visual Analysis</h3>
+            <img id="annotatedImage" alt="AI annotated image">
+        </div>
+
+        <div class="result-section">
+            <h3>Scene Description</h3>
+            <p id="sceneDescription"></p>
+        </div>
+
+        <div class="result-section">
+            <h3>Image Caption</h3>
+            <p id="caption"></p>
+        </div>
+
+        <div class="result-section">
+            <h3>Visual Question Answer</h3>
+            <p id="answer"></p>
+        </div>
+
+        <div class="result-section">
+            <h3>Classification</h3>
+            <pre id="classification"></pre>
+        </div>
+
+        <div class="result-section">
+            <h3>Detection Summary</h3>
+            <pre id="summary"></pre>
+        </div>
+
+    </div>
+
+    <script>
+        const imageInput = document.getElementById("imageInput");
+        const preview = document.getElementById("preview");
+        const analyzeButton = document.getElementById("analyzeButton");
+        const questionInput = document.getElementById("questionInput");
+        const loading = document.getElementById("loading");
+        const resultsPanel = document.getElementById("resultsPanel");
+        const annotatedImage = document.getElementById("annotatedImage");
+
+        imageInput.addEventListener("change", () => {
+            const file = imageInput.files[0];
+
+            if (!file) {
+                preview.style.display = "none";
+                return;
+            }
+
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = "block";
+        });
+
+        analyzeButton.addEventListener("click", async () => {
+            const file = imageInput.files[0];
+
+            if (!file) {
+                alert("Please select an image first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            const question = questionInput.value.trim();
+
+            if (question) {
+                formData.append("question", question);
+            }
+
+            loading.style.display = "block";
+            resultsPanel.style.display = "none";
+            analyzeButton.disabled = true;
+
+            try {
+                const response = await fetch(
+                    "/vision/analyze",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "Analysis failed."
+                    );
+                }
+
+                const result = data.result;
+
+                if (result.annotated_image) {
+                    annotatedImage.src =
+                        "/static/annotated/" +
+                        result.annotated_image;
+
+                    annotatedImage.style.display = "block";
+                }
+
+                document.getElementById("sceneDescription").textContent =
+                    result.scene_description || "No description.";
+
+                document.getElementById("caption").textContent =
+                    result.caption || "No caption.";
+
+                document.getElementById("answer").textContent =
+                    result.answer || "No question was asked.";
+
+                document.getElementById("classification").textContent =
+                    JSON.stringify(
+                        result.classification || [],
+                        null,
+                        2
+                    );
+
+                document.getElementById("summary").textContent =
+                    JSON.stringify(
+                        result.summary || {},
+                        null,
+                        2
+                    );
+
+                resultsPanel.style.display = "block";
+
+            } catch (error) {
+                resultsPanel.style.display = "block";
+
+                document.getElementById("sceneDescription").innerHTML =
+                    '<span class="error">' +
+                    error.message +
+                    '</span>';
+
+            } finally {
+                loading.style.display = "none";
+                analyzeButton.disabled = false;
+            }
+        });
+    </script>
+
+
+<section id="video-mode" style="margin-top:30px;padding:20px;border:1px solid #ddd;border-radius:12px;">
+    <h2>Video Mode</h2>
+
+    <p>Select a video and analyze it frame by frame.</p>
+
+    <input
+        id="video-input"
+        type="file"
+        accept="video/*"
+    >
+
+    <button
+        id="video-analyze-button"
+        type="button"
+        style="margin-left:8px;padding:8px 14px;"
+    >
+        Analyze Video
+    </button>
+
+    <p id="video-status" style="margin-top:12px;"></p>
+
+    <div id="video-results" style="display:none;margin-top:15px;">
+        <h3>Video Analysis</h3>
+
+        <p>
+            <strong>Frames processed:</strong>
+            <span id="video-frames">0</span>
+        </p>
+
+        <p>
+            <strong>Faces detected:</strong>
+            <span id="video-faces">0</span>
+        </p>
+
+        <p>
+            <strong>Hands detected:</strong>
+            <span id="video-hands">0</span>
+        </p>
+
+        <p>
+            <strong>Poses detected:</strong>
+            <span id="video-poses">0</span>
+        </p>
+    </div>
+</section>
+
+<script>
+(function () {
+    const input = document.getElementById("video-input");
+    const button = document.getElementById("video-analyze-button");
+    const status = document.getElementById("video-status");
+    const resultsPanel = document.getElementById("video-results");
+
+    if (!input || !button || !status || !resultsPanel) {
+        return;
+    }
+
+    button.addEventListener("click", async function () {
+        const file = input.files[0];
+
+        if (!file) {
+            status.textContent = "Please select a video first.";
+            return;
+        }
+
+        status.textContent = "Processing video... Please wait.";
+        resultsPanel.style.display = "none";
+        button.disabled = true;
+
+        try {
+            const formData = new FormData();
+            formData.append("video", file);
+
+            const response = await fetch("/vision/video", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.detail || "Video analysis failed."
+                );
+            }
+
+            const result = data.result || {};
+            const frames = result.results || [];
+
+            let faces = 0;
+            let hands = 0;
+            let poses = 0;
+
+            for (const frameResult of frames) {
+                const summary = frameResult.summary || {};
+
+                faces = Math.max(
+                    faces,
+                    Number(summary.faces ?? 0)
+                );
+
+                hands = Math.max(
+                    hands,
+                    Number(summary.hands ?? 0)
+                );
+
+                poses = Math.max(
+                    poses,
+                    Number(summary.poses ?? 0)
+                );
+            }
+
+            document.getElementById("video-frames").textContent =
+                String(result.frames_processed ?? frames.length);
+
+            document.getElementById("video-faces").textContent =
+                String(faces);
+
+            document.getElementById("video-hands").textContent =
+                String(hands);
+
+            document.getElementById("video-poses").textContent =
+                String(poses);
+
+            resultsPanel.style.display = "block";
+            status.textContent =
+                "Video analysis completed successfully.";
+
+        } catch (error) {
+            status.textContent =
+                "Error: " + error.message;
+        } finally {
+            button.disabled = false;
+        }
+    });
+})();
+</script>
+
+</body>
+</html>
