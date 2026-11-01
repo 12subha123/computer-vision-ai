@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Computer Vision AI</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,8 +15,14 @@
             color: #222;
         }
 
-        h1 { margin-bottom: 8px; }
-        .subtitle { color: #666; margin-bottom: 25px; }
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+        }
 
         .panel {
             background: white;
@@ -23,6 +30,10 @@
             border-radius: 12px;
             margin-bottom: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .panel h2 {
+            margin-top: 0;
         }
 
         input[type="file"],
@@ -44,9 +55,21 @@
             font-weight: bold;
         }
 
+        button:hover:not(:disabled) {
+            background: #1d4ed8;
+        }
+
         button:disabled {
             background: #94a3b8;
             cursor: not-allowed;
+        }
+
+        .secondary-button {
+            background: #0f766e;
+        }
+
+        .secondary-button:hover:not(:disabled) {
+            background: #0d5f59;
         }
 
         #preview,
@@ -57,8 +80,13 @@
             border-radius: 10px;
         }
 
-        #preview { display: none; }
-        #annotatedImage { display: none; }
+        #preview {
+            display: none;
+        }
+
+        #annotatedImage {
+            display: none;
+        }
 
         #loading {
             display: none;
@@ -87,15 +115,105 @@
             color: #dc2626;
             font-weight: bold;
         }
+
+        .success {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .muted {
+            color: #64748b;
+        }
+
+        .route-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .route-stat {
+            margin: 8px 0;
+        }
+
+        .route-stat strong {
+            display: inline-block;
+            min-width: 145px;
+        }
+
+        #routeLoading {
+            display: none;
+            color: #0f766e;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        #routeResults {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #routeMap {
+            display: none;
+            width: 100%;
+            height: 360px;
+            margin-top: 20px;
+            border-radius: 10px;
+            background: #e2e8f0;
+            overflow: hidden;
+        }
+
+        #routeMap svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .route-legend {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-line {
+            width: 24px;
+            height: 4px;
+            border-radius: 4px;
+            background: #2563eb;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #16a34a;
+        }
+
+        .legend-dot.end {
+            background: #dc2626;
+        }
     </style>
 </head>
 
 <body>
 
     <h1>Computer Vision AI</h1>
+
     <p class="subtitle">
-        Upload an image and let the Vision Assistant understand it.
+        Understand images, analyze videos, and explore satellite intelligence.
     </p>
+
+    <!-- IMAGE ANALYSIS -->
 
     <div class="panel">
         <h2>Analyze Image</h2>
@@ -159,7 +277,158 @@
 
     </div>
 
+    <!-- SATELLITE INTELLIGENCE -->
+
+    <div class="panel" id="satellite-intelligence">
+
+        <h2>Satellite Intelligence</h2>
+
+        <p class="muted">
+            Explore places and find the shortest road route between them.
+        </p>
+
+        <input
+            type="text"
+            id="routeSource"
+            placeholder="From (for example: Kolkata)"
+        >
+
+        <input
+            type="text"
+            id="routeTarget"
+            placeholder="To (for example: Durgapur)"
+        >
+
+        <button
+            id="findRouteButton"
+            class="secondary-button"
+            type="button"
+        >
+            Find Route
+        </button>
+
+        <div id="routeLoading">
+            Finding the best available road route... Please wait.
+        </div>
+
+        <div id="routeError" class="error" style="display:none;margin-top:15px;"></div>
+
+        <div id="routeResults">
+
+            <h3>Route Result</h3>
+
+            <div class="route-card">
+
+                <div class="route-stat">
+                    <strong>From:</strong>
+                    <span id="routeSourceName"></span>
+                </div>
+
+                <div class="route-stat">
+                    <strong>To:</strong>
+                    <span id="routeTargetName"></span>
+                </div>
+
+                <div class="route-stat">
+                    <strong>Road distance:</strong>
+                    <span id="routeDistance"></span>
+                </div>
+
+                <div class="route-stat">
+                    <strong>Route points:</strong>
+                    <span id="routePointCount"></span>
+                </div>
+
+                <p class="muted" style="margin-bottom:0;">
+                    Travel-time prediction and route alternatives will be added next.
+                </p>
+
+            </div>
+
+            <div id="routeMap" aria-label="Route visualization"></div>
+
+            <div class="route-legend">
+                <div class="legend-item">
+                    <span class="legend-line"></span>
+                    <span>Road route</span>
+                </div>
+
+                <div class="legend-item">
+                    <span class="legend-dot"></span>
+                    <span>Start</span>
+                </div>
+
+                <div class="legend-item">
+                    <span class="legend-dot end"></span>
+                    <span>Destination</span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- VIDEO MODE -->
+
+    <section
+        id="video-mode"
+        class="panel"
+    >
+
+        <h2>Video Mode</h2>
+
+        <p class="muted">
+            Select a video and analyze it frame by frame.
+        </p>
+
+        <input
+            id="video-input"
+            type="file"
+            accept="video/*"
+        >
+
+        <button
+            id="video-analyze-button"
+            type="button"
+        >
+            Analyze Video
+        </button>
+
+        <p id="video-status" style="margin-top:12px;"></p>
+
+        <div id="video-results" style="display:none;margin-top:15px;">
+
+            <h3>Video Analysis</h3>
+
+            <p>
+                <strong>Frames processed:</strong>
+                <span id="video-frames">0</span>
+            </p>
+
+            <p>
+                <strong>Faces detected:</strong>
+                <span id="video-faces">0</span>
+            </p>
+
+            <p>
+                <strong>Hands detected:</strong>
+                <span id="video-hands">0</span>
+            </p>
+
+            <p>
+                <strong>Poses detected:</strong>
+                <span id="video-poses">0</span>
+            </p>
+
+        </div>
+
+    </section>
+
     <script>
+        // ============================================================
+        // IMAGE ANALYSIS
+        // ============================================================
+
         const imageInput = document.getElementById("imageInput");
         const preview = document.getElementById("preview");
         const analyzeButton = document.getElementById("analyzeButton");
@@ -181,6 +450,7 @@
         });
 
         analyzeButton.addEventListener("click", async () => {
+
             const file = imageInput.files[0];
 
             if (!file) {
@@ -202,6 +472,7 @@
             analyzeButton.disabled = true;
 
             try {
+
                 const response = await fetch(
                     "/vision/analyze",
                     {
@@ -218,14 +489,20 @@
                     );
                 }
 
-                const result = data.result;
+                const result = data.result || {};
 
                 if (result.annotated_image) {
+
                     annotatedImage.src =
                         "/static/annotated/" +
                         result.annotated_image;
 
                     annotatedImage.style.display = "block";
+
+                } else {
+
+                    annotatedImage.style.display = "none";
+
                 }
 
                 document.getElementById("sceneDescription").textContent =
@@ -254,6 +531,7 @@
                 resultsPanel.style.display = "block";
 
             } catch (error) {
+
                 resultsPanel.style.display = "block";
 
                 document.getElementById("sceneDescription").innerHTML =
@@ -262,150 +540,391 @@
                     '</span>';
 
             } finally {
+
                 loading.style.display = "none";
                 analyzeButton.disabled = false;
+
             }
         });
-    </script>
 
 
-<section id="video-mode" style="margin-top:30px;padding:20px;border:1px solid #ddd;border-radius:12px;">
-    <h2>Video Mode</h2>
+        // ============================================================
+        // SATELLITE ROUTING
+        // ============================================================
 
-    <p>Select a video and analyze it frame by frame.</p>
+        const routeSource = document.getElementById("routeSource");
+        const routeTarget = document.getElementById("routeTarget");
+        const findRouteButton = document.getElementById("findRouteButton");
+        const routeLoading = document.getElementById("routeLoading");
+        const routeError = document.getElementById("routeError");
+        const routeResults = document.getElementById("routeResults");
+        const routeMap = document.getElementById("routeMap");
 
-    <input
-        id="video-input"
-        type="file"
-        accept="video/*"
-    >
+        function showRouteError(message) {
 
-    <button
-        id="video-analyze-button"
-        type="button"
-        style="margin-left:8px;padding:8px 14px;"
-    >
-        Analyze Video
-    </button>
+            routeError.textContent = message;
+            routeError.style.display = "block";
 
-    <p id="video-status" style="margin-top:12px;"></p>
-
-    <div id="video-results" style="display:none;margin-top:15px;">
-        <h3>Video Analysis</h3>
-
-        <p>
-            <strong>Frames processed:</strong>
-            <span id="video-frames">0</span>
-        </p>
-
-        <p>
-            <strong>Faces detected:</strong>
-            <span id="video-faces">0</span>
-        </p>
-
-        <p>
-            <strong>Hands detected:</strong>
-            <span id="video-hands">0</span>
-        </p>
-
-        <p>
-            <strong>Poses detected:</strong>
-            <span id="video-poses">0</span>
-        </p>
-    </div>
-</section>
-
-<script>
-(function () {
-    const input = document.getElementById("video-input");
-    const button = document.getElementById("video-analyze-button");
-    const status = document.getElementById("video-status");
-    const resultsPanel = document.getElementById("video-results");
-
-    if (!input || !button || !status || !resultsPanel) {
-        return;
-    }
-
-    button.addEventListener("click", async function () {
-        const file = input.files[0];
-
-        if (!file) {
-            status.textContent = "Please select a video first.";
-            return;
         }
 
-        status.textContent = "Processing video... Please wait.";
-        resultsPanel.style.display = "none";
-        button.disabled = true;
+        function clearRouteError() {
 
-        try {
-            const formData = new FormData();
-            formData.append("video", file);
+            routeError.textContent = "";
+            routeError.style.display = "none";
 
-            const response = await fetch("/vision/video", {
-                method: "POST",
-                body: formData
+        }
+
+        function createRouteMap(coordinates) {
+
+            if (!Array.isArray(coordinates) || coordinates.length < 2) {
+
+                routeMap.style.display = "none";
+                routeMap.innerHTML = "";
+                return;
+
+            }
+
+            const width = 860;
+            const height = 360;
+            const padding = 30;
+
+            const longitudes = coordinates.map(
+                point => Number(point.longitude)
+            );
+
+            const latitudes = coordinates.map(
+                point => Number(point.latitude)
+            );
+
+            const minLongitude = Math.min(...longitudes);
+            const maxLongitude = Math.max(...longitudes);
+            const minLatitude = Math.min(...latitudes);
+            const maxLatitude = Math.max(...latitudes);
+
+            const longitudeRange =
+                Math.max(maxLongitude - minLongitude, 0.000001);
+
+            const latitudeRange =
+                Math.max(maxLatitude - minLatitude, 0.000001);
+
+            function project(point) {
+
+                const x =
+                    padding +
+                    (
+                        (Number(point.longitude) - minLongitude)
+                        / longitudeRange
+                    ) *
+                    (width - padding * 2);
+
+                const y =
+                    height -
+                    padding -
+                    (
+                        (Number(point.latitude) - minLatitude)
+                        / latitudeRange
+                    ) *
+                    (height - padding * 2);
+
+                return { x, y };
+
+            }
+
+            const projected = coordinates.map(project);
+
+            const pathData = projected
+                .map(
+                    (point, index) =>
+                        (index === 0 ? "M " : "L ") +
+                        point.x.toFixed(2) +
+                        " " +
+                        point.y.toFixed(2)
+                )
+                .join(" ");
+
+            const start = projected[0];
+            const end = projected[projected.length - 1];
+
+            routeMap.innerHTML = `
+                <svg
+                    viewBox="0 0 ${width} ${height}"
+                    role="img"
+                    aria-label="Road route visualization"
+                >
+                    <rect
+                        x="0"
+                        y="0"
+                        width="${width}"
+                        height="${height}"
+                        fill="#e2e8f0"
+                    />
+
+                    <path
+                        d="${pathData}"
+                        fill="none"
+                        stroke="#2563eb"
+                        stroke-width="5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+
+                    <circle
+                        cx="${start.x}"
+                        cy="${start.y}"
+                        r="8"
+                        fill="#16a34a"
+                    />
+
+                    <circle
+                        cx="${end.x}"
+                        cy="${end.y}"
+                        r="8"
+                        fill="#dc2626"
+                    />
+                </svg>
+            `;
+
+            routeMap.style.display = "block";
+
+        }
+
+        findRouteButton.addEventListener("click", async () => {
+
+            const source = routeSource.value.trim();
+            const target = routeTarget.value.trim();
+
+            clearRouteError();
+            routeResults.style.display = "none";
+            routeMap.style.display = "none";
+
+            if (!source || !target) {
+
+                showRouteError(
+                    "Please enter both a starting place and a destination."
+                );
+
+                return;
+
+            }
+
+            if (source.toLowerCase() === target.toLowerCase()) {
+
+                showRouteError(
+                    "Please choose two different places."
+                );
+
+                return;
+
+            }
+
+            findRouteButton.disabled = true;
+            routeLoading.style.display = "block";
+
+            try {
+
+                const response = await fetch(
+                    "/satellite/route-by-place",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            source,
+                            target
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.detail || "Could not find the route."
+                    );
+
+                }
+
+                const sourcePlace = data.source || {};
+                const targetPlace = data.target || {};
+                const route = data.route || {};
+
+                document.getElementById("routeSourceName").textContent =
+                    sourcePlace.display_name || source;
+
+                document.getElementById("routeTargetName").textContent =
+                    targetPlace.display_name || target;
+
+                document.getElementById("routeDistance").textContent =
+                    Number(route.distance_km || 0).toFixed(2) +
+                    " km";
+
+                document.getElementById("routePointCount").textContent =
+                    String(route.coordinate_count || 0);
+
+                createRouteMap(route.coordinates || []);
+
+                routeResults.style.display = "block";
+
+            } catch (error) {
+
+                showRouteError(
+                    error.message || "Could not find the route."
+                );
+
+            } finally {
+
+                routeLoading.style.display = "none";
+                findRouteButton.disabled = false;
+
+            }
+        });
+
+
+        // ============================================================
+        // VIDEO ANALYSIS
+        // ============================================================
+
+        (function () {
+
+            const input =
+                document.getElementById("video-input");
+
+            const button =
+                document.getElementById("video-analyze-button");
+
+            const status =
+                document.getElementById("video-status");
+
+            const resultsPanel =
+                document.getElementById("video-results");
+
+            if (
+                !input ||
+                !button ||
+                !status ||
+                !resultsPanel
+            ) {
+                return;
+            }
+
+            button.addEventListener("click", async function () {
+
+                const file = input.files[0];
+
+                if (!file) {
+
+                    status.textContent =
+                        "Please select a video first.";
+
+                    return;
+
+                }
+
+                status.textContent =
+                    "Processing video... Please wait.";
+
+                resultsPanel.style.display = "none";
+                button.disabled = true;
+
+                try {
+
+                    const formData = new FormData();
+                    formData.append("video", file);
+
+                    const response = await fetch(
+                        "/vision/video",
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.detail ||
+                            "Video analysis failed."
+                        );
+
+                    }
+
+                    const result = data.result || {};
+                    const frames = result.results || [];
+
+                    let faces = 0;
+                    let hands = 0;
+                    let poses = 0;
+
+                    for (const frameResult of frames) {
+
+                        const summary =
+                            frameResult.summary || {};
+
+                        faces = Math.max(
+                            faces,
+                            Number(summary.faces ?? 0)
+                        );
+
+                        hands = Math.max(
+                            hands,
+                            Number(summary.hands ?? 0)
+                        );
+
+                        poses = Math.max(
+                            poses,
+                            Number(summary.poses ?? 0)
+                        );
+
+                    }
+
+                    document.getElementById(
+                        "video-frames"
+                    ).textContent =
+                        String(
+                            result.frames_processed ??
+                            frames.length
+                        );
+
+                    document.getElementById(
+                        "video-faces"
+                    ).textContent =
+                        String(faces);
+
+                    document.getElementById(
+                        "video-hands"
+                    ).textContent =
+                        String(hands);
+
+                    document.getElementById(
+                        "video-poses"
+                    ).textContent =
+                        String(poses);
+
+                    resultsPanel.style.display = "block";
+
+                    status.textContent =
+                        "Video analysis completed successfully.";
+
+                } catch (error) {
+
+                    status.textContent =
+                        "Error: " + error.message;
+
+                } finally {
+
+                    button.disabled = false;
+
+                }
+
             });
 
-            const data = await response.json();
+        })();
 
-            if (!response.ok) {
-                throw new Error(
-                    data.detail || "Video analysis failed."
-                );
-            }
-
-            const result = data.result || {};
-            const frames = result.results || [];
-
-            let faces = 0;
-            let hands = 0;
-            let poses = 0;
-
-            for (const frameResult of frames) {
-                const summary = frameResult.summary || {};
-
-                faces = Math.max(
-                    faces,
-                    Number(summary.faces ?? 0)
-                );
-
-                hands = Math.max(
-                    hands,
-                    Number(summary.hands ?? 0)
-                );
-
-                poses = Math.max(
-                    poses,
-                    Number(summary.poses ?? 0)
-                );
-            }
-
-            document.getElementById("video-frames").textContent =
-                String(result.frames_processed ?? frames.length);
-
-            document.getElementById("video-faces").textContent =
-                String(faces);
-
-            document.getElementById("video-hands").textContent =
-                String(hands);
-
-            document.getElementById("video-poses").textContent =
-                String(poses);
-
-            resultsPanel.style.display = "block";
-            status.textContent =
-                "Video analysis completed successfully.";
-
-        } catch (error) {
-            status.textContent =
-                "Error: " + error.message;
-        } finally {
-            button.disabled = false;
-        }
-    });
-})();
-</script>
+    </script>
 
 </body>
 </html>

@@ -1,0 +1,86 @@
+﻿from dataclasses import dataclass
+from pathlib import Path
+
+import numpy as np
+import rasterio
+from rasterio.features import shapes
+from shapely.geometry import shape
+
+
+@dataclass(frozen=True)
+class LandCoverRegion:
+    class_id: int
+    area_pixels: int
+    area_square_meters: float
+    geometry: object
+
+
+class SatelliteGeometricAnalyzer:
+    """
+    Converts a land-cover prediction raster into spatial regions.
+
+    CNN:
+        predicts the land-cover class.
+
+    This module:
+        measures area and extracts spatial geometry.
+    """
+
+    def analyze_prediction_raster(
+        self,
+        prediction_path: str | Path,
+        class_id: int,
+    ):
+        prediction_path = Path(prediction_path)
+
+        if not prediction_path.exists():
+            raise FileNotFoundError(
+                f"Prediction raster not found: {prediction_path}"
+            )
+
+        with rasterio.open(prediction_path) as dataset:
+            raster = dataset.read(1)
+            transform = dataset.transform
+            pixel_width = abs(transform.a)
+            pixel_height = abs(transform.e)
+
+            pixel_area = pixel_width * pixel_height
+
+            mask = raster == class_id
+
+            if not np.any(mask):
+                return []
+
+            regions = []
+
+            for geometry_json, value in shapes(
+                raster.astype(np.int16),
+                mask=mask,
+                transform=transform,
+            ):
+                if int(value) != class_id:
+                    continue
+
+                geometry = shape(geometry_json)
+
+                if geometry.is_empty:
+                    continue
+
+                area_pixels = int(
+                    np.count_nonzero(
+                        mask
+                    )
+                )
+
+                regions.append(
+                    LandCoverRegion(
+                        class_id=class_id,
+                        area_pixels=area_pixels,
+                        area_square_meters=(
+                            area_pixels * pixel_area
+                        ),
+                        geometry=geometry,
+                    )
+                )
+
+            return regions

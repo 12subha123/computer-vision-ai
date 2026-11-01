@@ -1,4 +1,4 @@
-﻿.venv/
+.venv/
 __pycache__/
 *.pyc
 *.pyo
@@ -33,3 +33,13 @@ Thumbs.db
 app/static/index.html.backup
 inference/*_result.jpg
 inference/vision_engine_result.jpg
+
+# Large local satellite / routing data
+data/osm/*.osm.pbf
+data/osm/generated/
+
+# Local routing datasets
+data/osm/*road_network.json
+
+# Temporary UI backups
+app/static/index.html.before-*

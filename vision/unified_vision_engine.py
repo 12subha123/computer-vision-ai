@@ -2,6 +2,8 @@
 
 from vision.vision_engine import VisionEngine
 from vision.object_detection import ObjectDetector
+from vision.satellite.satellite_input import is_satellite_input
+from vision.satellite.land_cover import SatelliteLandCoverAdapter
 
 
 class UnifiedVisionEngine:
@@ -9,22 +11,46 @@ class UnifiedVisionEngine:
         self.vision_engine = VisionEngine()
         self.object_detector = ObjectDetector(confidence=0.25)
 
+        self.satellite_land_cover = SatelliteLandCoverAdapter()
+
     def process_image(self, image_path):
+        image_path = Path(image_path)
+
+        if is_satellite_input(image_path):
+            return self.process_satellite(image_path)
+
         import cv2
 
         frame = cv2.imread(str(image_path))
 
         if frame is None:
-            raise FileNotFoundError(f"Could not load image: {image_path}")
+            raise FileNotFoundError(
+                f"Could not load image: {image_path}"
+            )
 
         vision_results = self.vision_engine.process(frame)
         object_results = self.object_detector.detect(image_path)
 
         return {
+            "input_type": "ordinary_image",
             "faces": vision_results.get("faces"),
             "hands": vision_results.get("hands"),
             "poses": vision_results.get("poses"),
             "objects": object_results,
+        }
+
+    def process_satellite(self, satellite_path):
+        satellite_path = Path(satellite_path)
+
+        if not satellite_path.exists():
+            raise FileNotFoundError(
+                f"Satellite input not found: {satellite_path}"
+            )
+
+        return {
+            "input_type": "satellite",
+            "path": str(satellite_path),
+            "status": "satellite_input_detected",
         }
 
     def _count_faces(self, value):
@@ -55,7 +81,15 @@ class UnifiedVisionEngine:
         return len(value) if hasattr(value, "__len__") else 0
 
     def get_summary(self, results):
+        if results.get("input_type") == "satellite":
+            return {
+                "input_type": "satellite",
+                "path": results["path"],
+                "status": results["status"],
+            }
+
         return {
+            "input_type": "ordinary_image",
             "faces": self._count_faces(results["faces"]),
             "hands": self._count_hands(results["hands"]),
             "poses": self._count_poses(results["poses"]),

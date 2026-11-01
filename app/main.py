@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from vision.vision_assistant import VisionAssistant
 from vision.video_processor import VideoVisionProcessor
 from vision.intelligent_vision_assistant import IntelligentVisionAssistant
+from app.satellite.router import router as satellite_router
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STATIC_DIR = PROJECT_ROOT / "app" / "static"
@@ -28,6 +29,8 @@ app.mount(
     StaticFiles(directory=str(STATIC_DIR)),
     name="static",
 )
+
+app.include_router(satellite_router)
 
 
 @app.get("/")
