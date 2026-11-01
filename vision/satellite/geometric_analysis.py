@@ -17,13 +17,8 @@ class LandCoverRegion:
 
 class SatelliteGeometricAnalyzer:
     """
-    Converts a land-cover prediction raster into spatial regions.
-
-    CNN:
-        predicts the land-cover class.
-
-    This module:
-        measures area and extracts spatial geometry.
+    Converts a land-cover prediction raster into connected
+    spatial regions for geographic analysis.
     """
 
     def analyze_prediction_raster(
@@ -38,12 +33,14 @@ class SatelliteGeometricAnalyzer:
                 f"Prediction raster not found: {prediction_path}"
             )
 
+        class_id = int(class_id)
+
         with rasterio.open(prediction_path) as dataset:
             raster = dataset.read(1)
             transform = dataset.transform
+
             pixel_width = abs(transform.a)
             pixel_height = abs(transform.e)
-
             pixel_area = pixel_width * pixel_height
 
             mask = raster == class_id
@@ -54,11 +51,11 @@ class SatelliteGeometricAnalyzer:
             regions = []
 
             for geometry_json, value in shapes(
-                raster.astype(np.int16),
+                mask.astype(np.uint8),
                 mask=mask,
                 transform=transform,
             ):
-                if int(value) != class_id:
+                if int(value) != 1:
                     continue
 
                 geometry = shape(geometry_json)
@@ -66,9 +63,14 @@ class SatelliteGeometricAnalyzer:
                 if geometry.is_empty:
                     continue
 
+                area_square_meters = float(
+                    geometry.area
+                )
+
                 area_pixels = int(
-                    np.count_nonzero(
-                        mask
+                    round(
+                        area_square_meters
+                        / pixel_area
                     )
                 )
 
@@ -76,9 +78,7 @@ class SatelliteGeometricAnalyzer:
                     LandCoverRegion(
                         class_id=class_id,
                         area_pixels=area_pixels,
-                        area_square_meters=(
-                            area_pixels * pixel_area
-                        ),
+                        area_square_meters=area_square_meters,
                         geometry=geometry,
                     )
                 )

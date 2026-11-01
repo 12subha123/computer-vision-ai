@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -279,94 +279,422 @@
 
     <!-- SATELLITE INTELLIGENCE -->
 
-    <div class="panel" id="satellite-intelligence">
+    
+<div class="panel" id="satellite-intelligence">
 
-        <h2>Satellite Intelligence</h2>
-
+    <div class="satellite-header">
+        <div class="satellite-eyebrow">SATELLITE INTELLIGENCE</div>
+        <h2>Understand places from above</h2>
         <p class="muted">
-            Explore places and find the shortest road route between them.
+            Explore land, satellite imagery, geographic patterns,
+            changes, routes, reasoning and optimization from one place.
         </p>
+    </div>
 
-        <input
-            type="text"
-            id="routeSource"
-            placeholder="From (for example: Kolkata)"
-        >
+    <div class="satellite-grid">
 
-        <input
-            type="text"
-            id="routeTarget"
-            placeholder="To (for example: Durgapur)"
-        >
+        <!-- 1. EXPLORE -->
+        <article class="satellite-card">
+            <div class="satellite-icon">???</div>
+            <h3>Explore an Area</h3>
+            <p class="muted">
+                Start with a place and explore what the satellite data reveals.
+            </p>
 
-        <button
-            id="findRouteButton"
-            class="secondary-button"
-            type="button"
-        >
-            Find Route
-        </button>
+            <input
+                id="satellite-area-place"
+                type="text"
+                placeholder="e.g. Jhargram, West Bengal"
+            >
 
-        <div id="routeLoading">
-            Finding the best available road route... Please wait.
-        </div>
+            <button
+                type="button"
+                id="satellite-explore-button"
+                class="secondary-button"
+            >
+                Explore Area
+            </button>
 
-        <div id="routeError" class="error" style="display:none;margin-top:15px;"></div>
+            <div
+                id="satellite-explore-result"
+                class="satellite-result"
+            ></div>
+        </article>
 
-        <div id="routeResults">
+        <!-- 2. IMAGERY -->
+        <article class="satellite-card">
+            <div class="satellite-icon">???</div>
+            <h3>Analyze Satellite Imagery</h3>
+            <p class="muted">
+                Inspect satellite imagery and understand its geographic properties.
+            </p>
 
-            <h3>Route Result</h3>
+            <input
+                id="satellite-imagery-file"
+                type="file"
+                accept=".jp2,.tif,.tiff"
+            >
 
-            <div class="route-card">
+            <button
+                type="button"
+                id="satellite-imagery-button"
+                class="secondary-button"
+            >
+                Analyze Imagery
+            </button>
 
-                <div class="route-stat">
-                    <strong>From:</strong>
-                    <span id="routeSourceName"></span>
-                </div>
+            <div
+                id="satellite-imagery-result"
+                class="satellite-result"
+            ></div>
+        </article>
 
-                <div class="route-stat">
-                    <strong>To:</strong>
-                    <span id="routeTargetName"></span>
-                </div>
+        <!-- 3. LAND COVER -->
+        <article class="satellite-card">
+            <div class="satellite-icon">??</div>
+            <h3>Land Cover</h3>
+            <p class="muted">
+                Understand the major land-cover types detected in an area.
+            </p>
 
-                <div class="route-stat">
-                    <strong>Road distance:</strong>
-                    <span id="routeDistance"></span>
-                </div>
+            <button
+                type="button"
+                id="satellite-land-cover-button"
+                class="secondary-button"
+            >
+                Analyze Land Cover
+            </button>
 
-                <div class="route-stat">
-                    <strong>Route points:</strong>
-                    <span id="routePointCount"></span>
-                </div>
+            <div
+                id="satellite-land-cover-result"
+                class="satellite-result"
+            ></div>
+        </article>
 
-                <p class="muted" style="margin-bottom:0;">
-                    Travel-time prediction and route alternatives will be added next.
-                </p>
+        <!-- 4. CHANGE DETECTION -->
+        <article class="satellite-card">
+            <div class="satellite-icon">??</div>
+            <h3>Change Detection</h3>
+            <p class="muted">
+                Compare two satellite observations and identify detected changes.
+            </p>
 
+            <label>
+                Earlier image
+                <input
+                    id="satellite-change-before"
+                    type="file"
+                    accept=".jp2,.tif,.tiff"
+                >
+            </label>
+
+            <label>
+                Later image
+                <input
+                    id="satellite-change-after"
+                    type="file"
+                    accept=".jp2,.tif,.tiff"
+                >
+            </label>
+
+            <button
+                type="button"
+                id="satellite-change-button"
+                class="secondary-button"
+            >
+                Detect Changes
+            </button>
+
+            <div
+                id="satellite-change-result"
+                class="satellite-result"
+            ></div>
+        </article>
+
+        <!-- 5. GEOGRAPHIC ANALYSIS -->
+        <article class="satellite-card">
+            <div class="satellite-icon">??</div>
+            <h3>Geographic Analysis</h3>
+            <p class="muted">
+                Examine spatial regions and their geographic structure.
+            </p>
+
+            <select id="satellite-geography-class">
+                <option value="10">Tree cover</option>
+                <option value="20">Shrubland</option>
+                <option value="30">Grassland</option>
+                <option value="40">Cropland</option>
+                <option value="50">Built-up</option>
+                <option value="60">Bare / sparse vegetation</option>
+                <option value="80">Permanent water bodies</option>
+                <option value="90">Herbaceous wetland</option>
+                <option value="95">Mangroves</option>
+            </select>
+
+            <button
+                type="button"
+                id="satellite-geography-button"
+                class="secondary-button"
+            >
+                Analyze Geography
+            </button>
+
+            <div
+                id="satellite-geography-result"
+                class="satellite-result"
+            ></div>
+        </article>
+
+        <!-- 6. ROUTE INTELLIGENCE -->
+        <article class="satellite-card satellite-route-card">
+            <div class="satellite-icon">???</div>
+            <h3>Route Intelligence</h3>
+            <p class="muted">
+                Find a road route between two places.
+            </p>
+
+            <input
+                type="text"
+                id="routeSource"
+                placeholder="From (for example: Kolkata)"
+            >
+
+            <input
+                type="text"
+                id="routeTarget"
+                placeholder="To (for example: Durgapur)"
+            >
+
+            <button
+                id="findRouteButton"
+                class="secondary-button"
+                type="button"
+            >
+                Find Route
+            </button>
+
+            <div id="routeLoading">
+                Finding the best available road route... Please wait.
             </div>
 
-            <div id="routeMap" aria-label="Route visualization"></div>
+            <div
+                id="routeError"
+                class="error"
+                style="display:none;margin-top:15px;"
+            ></div>
 
-            <div class="route-legend">
-                <div class="legend-item">
-                    <span class="legend-line"></span>
-                    <span>Road route</span>
+            <div id="routeResults">
+
+                <h3>Route Result</h3>
+
+                <div class="route-card">
+
+                    <div class="route-stat">
+                        <strong>From:</strong>
+                        <span id="routeSourceName"></span>
+                    </div>
+
+                    <div class="route-stat">
+                        <strong>To:</strong>
+                        <span id="routeTargetName"></span>
+                    </div>
+
+                    <div class="route-stat">
+                        <strong>Road distance:</strong>
+                        <span id="routeDistance"></span>
+                    </div>
+
+                    <div class="route-stat">
+                        <strong>Route points:</strong>
+                        <span id="routePointCount"></span>
+                    </div>
+
                 </div>
 
-                <div class="legend-item">
-                    <span class="legend-dot"></span>
-                    <span>Start</span>
+                <div id="routeMap" aria-label="Route visualization"></div>
+
+                <div class="route-legend">
+                    <div class="legend-item">
+                        <span class="legend-line"></span>
+                        <span>Road route</span>
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot"></span>
+                        <span>Start</span>
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot end"></span>
+                        <span>Destination</span>
+                    </div>
                 </div>
 
-                <div class="legend-item">
-                    <span class="legend-dot end"></span>
-                    <span>Destination</span>
-                </div>
             </div>
+        </article>
 
-        </div>
+        <!-- 7. AI REASONING -->
+        <article class="satellite-card">
+            <div class="satellite-icon">??</div>
+            <h3>AI Reasoning</h3>
+            <p class="muted">
+                Turn satellite observations into understandable conclusions.
+            </p>
+
+            <textarea
+                id="satellite-reasoning-question"
+                rows="3"
+                placeholder="What does this area tell me?"
+            ></textarea>
+
+            <button
+                type="button"
+                id="satellite-reasoning-button"
+                class="secondary-button"
+            >
+                Ask AI
+            </button>
+
+            <div
+                id="satellite-reasoning-result"
+                class="satellite-result"
+            ></div>
+        </article>
+
+        <!-- 8. OPTIMIZATION -->
+        <article class="satellite-card">
+            <div class="satellite-icon">?</div>
+            <h3>Optimization</h3>
+            <p class="muted">
+                Choose the best available route according to your goal.
+            </p>
+
+            <select id="satellite-optimization-objective">
+                <option value="shortest">Shortest route</option>
+                <option value="fastest" disabled>
+                    Fastest route ? travel-time data coming soon
+                </option>
+                <option value="balanced" disabled>
+                    Balanced route ? travel-time data coming soon
+                </option>
+            </select>
+
+            <button
+                type="button"
+                id="satellite-optimization-button"
+                class="secondary-button"
+            >
+                Optimize
+            </button>
+
+            <div
+                id="satellite-optimization-result"
+                class="satellite-result"
+            ></div>
+        </article>
 
     </div>
+
+</div>
+
+<style>
+#satellite-intelligence {
+    margin-top: 32px;
+}
+
+.satellite-header {
+    margin-bottom: 24px;
+}
+
+.satellite-eyebrow {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    opacity: 0.55;
+    margin-bottom: 6px;
+}
+
+.satellite-header h2 {
+    margin-bottom: 8px;
+}
+
+.satellite-header p {
+    max-width: 720px;
+    line-height: 1.6;
+}
+
+.satellite-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.satellite-card {
+    padding: 20px;
+    border-radius: 18px;
+    border: 1px solid rgba(127, 127, 127, 0.18);
+    background: rgba(127, 127, 127, 0.06);
+}
+
+.satellite-icon {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.satellite-card h3 {
+    margin-top: 0;
+}
+
+.satellite-card input,
+.satellite-card select,
+.satellite-card textarea {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(127, 127, 127, 0.25);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+}
+
+.satellite-card textarea {
+    resize: vertical;
+}
+
+.satellite-card button {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.satellite-result {
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+#routeLoading {
+    display: none;
+    margin-top: 12px;
+}
+
+#routeResults {
+    display: none;
+}
+
+.satellite-route-card .route-card {
+    margin-top: 12px;
+}
+
+@media (max-width: 620px) {
+    .satellite-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 
     <!-- VIDEO MODE -->
 
@@ -549,6 +877,679 @@
 
 
         // ============================================================
+        // ============================================================
+        // SATELLITE EXPLORE AREA
+        // ============================================================
+
+        const satelliteAreaPlace = document.getElementById("satellite-area-place");
+        const satelliteExploreButton = document.getElementById("satellite-explore-button");
+        const satelliteExploreResult = document.getElementById("satellite-explore-result");
+
+        satelliteExploreButton.addEventListener("click", async () => {
+            const place = satelliteAreaPlace.value.trim();
+
+            if (!place) {
+                satelliteExploreResult.innerHTML =
+                    '<span class="error">Please enter a place to explore.</span>';
+                return;
+            }
+
+            satelliteExploreButton.disabled = true;
+            satelliteExploreResult.textContent =
+                "Exploring the satellite data...";
+
+            try {
+                const response = await fetch("/satellite/user/explore-area", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        source: place,
+                        target: place
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "Could not explore this area."
+                    );
+                }
+
+                const center = data.center || {};
+                const geographicAnalysis =
+                    data.geographic_analysis || {};
+                const reasoning = data.reasoning || {};
+                const dominantClass =
+                    reasoning.dominant_class || {};
+
+                satelliteExploreResult.innerHTML = `
+                    <div class="satellite-result-card">
+                        <strong>${data.area_name || place}</strong>
+
+                        <p>
+                            <strong>Location:</strong>
+                            ${Number(center.latitude || 0).toFixed(5)},
+                            ${Number(center.longitude || 0).toFixed(5)}
+                        </p>
+
+                        <p>
+                            <strong>Predicted land-cover classes:</strong>
+                            ${geographicAnalysis.predicted_classes ?? "N/A"}
+                        </p>
+
+                        <p>
+                            <strong>Image size:</strong>
+                            ${geographicAnalysis.width ?? "N/A"} ?
+                            ${geographicAnalysis.height ?? "N/A"}
+                        </p>
+
+                        <p>
+                            <strong>Coordinate system:</strong>
+                            ${geographicAnalysis.crs || "N/A"}
+                        </p>
+
+                        ${
+                            dominantClass.class_name
+                                ? `
+                                    <p>
+                                        <strong>Dominant land cover:</strong>
+                                        ${dominantClass.class_name}
+                                        (${Number(
+                                            dominantClass.area_hectares || 0
+                                        ).toFixed(2)} hectares)
+                                    </p>
+                                `
+                                : ""
+                        }
+
+                        ${
+                            reasoning.conclusion
+                                ? `
+                                    <p>
+                                        <strong>AI interpretation:</strong>
+                                        ${reasoning.conclusion}
+                                    </p>
+                                `
+                                : ""
+                        }
+                    </div>
+                `;
+            } catch (error) {
+                satelliteExploreResult.innerHTML =
+                    `<span class="error">${error.message}</span>`;
+            } finally {
+                satelliteExploreButton.disabled = false;
+            }
+        });
+
+
+        // ============================================================
+        // SATELLITE IMAGERY ANALYSIS
+        // ============================================================
+
+        const satelliteImageryFile = document.getElementById("satellite-imagery-file");
+        const satelliteImageryButton = document.getElementById("satellite-imagery-button");
+        const satelliteImageryResult = document.getElementById("satellite-imagery-result");
+
+        satelliteImageryButton.addEventListener("click", async () => {
+            const file = satelliteImageryFile.files[0];
+
+            if (!file) {
+                satelliteImageryResult.innerHTML =
+                    '<span class="error">Please select a satellite imagery file first.</span>';
+                return;
+            }
+
+            satelliteImageryButton.disabled = true;
+            satelliteImageryResult.textContent =
+                "Analyzing the satellite imagery...";
+
+            try {
+                const formData = new FormData();
+                formData.append("imagery", file);
+
+                const response = await fetch(
+                    "/satellite/user/analyze-imagery",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "Satellite imagery analysis failed."
+                    );
+                }
+
+                satelliteImageryResult.innerHTML = `
+                    <div class="satellite-result-card">
+                        <strong>Satellite imagery analysis complete</strong>
+
+                        <p>
+                            <strong>File:</strong>
+                            ${file.name}
+                        </p>
+
+                        <p>
+                            <strong>Result:</strong>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </p>
+                    </div>
+                `;
+            } catch (error) {
+                satelliteImageryResult.innerHTML =
+                    '<span class="error">' +
+                    (error.message || "Satellite imagery analysis failed.") +
+                    "</span>";
+            } finally {
+                satelliteImageryButton.disabled = false;
+            }
+        });
+
+        // ============================================================
+        // ============================================================
+        // SATELLITE LAND COVER ANALYSIS
+        // ============================================================
+
+        const satelliteLandCoverButton =
+            document.getElementById("satellite-land-cover-button");
+
+        const satelliteLandCoverResult =
+            document.getElementById("satellite-land-cover-result");
+
+        satelliteLandCoverButton.addEventListener("click", async () => {
+            satelliteLandCoverButton.disabled = true;
+
+            satelliteLandCoverResult.textContent =
+                "Analyzing the real satellite land-cover prediction...";
+
+            try {
+                const response = await fetch(
+                    "/satellite/user/analyze-land-cover-real",
+                    {
+                        method: "POST"
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "Land-cover analysis failed."
+                    );
+                }
+
+                satelliteLandCoverResult.innerHTML = `
+                    <div class="satellite-result-card">
+                        <strong>Land-cover analysis complete</strong>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                satelliteLandCoverResult.innerHTML =
+                    '<span class="error">' +
+                    (error.message || "Land-cover analysis failed.") +
+                    "</span>";
+            } finally {
+                satelliteLandCoverButton.disabled = false;
+            }
+        });
+        // SATELLITE CHANGE DETECTION
+        // ============================================================
+
+        const satelliteChangeBefore = document.getElementById("satellite-change-before");
+        const satelliteChangeAfter = document.getElementById("satellite-change-after");
+        const satelliteChangeButton = document.getElementById("satellite-change-button");
+        const satelliteChangeResult = document.getElementById("satellite-change-result");
+
+        satelliteChangeButton.addEventListener("click", async () => {
+            const earlierFile = satelliteChangeBefore.files[0];
+            const laterFile = satelliteChangeAfter.files[0];
+
+            if (!earlierFile || !laterFile) {
+                satelliteChangeResult.innerHTML =
+                    '<span class="error">Please select both the earlier and later satellite images.</span>';
+                return;
+            }
+
+            satelliteChangeButton.disabled = true;
+            satelliteChangeResult.textContent =
+                "Comparing the two satellite observations...";
+
+            try {
+                const formData = new FormData();
+                formData.append("earlier", earlierFile);
+                formData.append("later", laterFile);
+
+                const response = await fetch(
+                    "/satellite/user/change-detection",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "Change detection failed."
+                    );
+                }
+
+                satelliteChangeResult.innerHTML = `
+                    <div class="satellite-result-card">
+                        <strong>Change detection complete</strong>
+
+                        <p>
+                            <strong>Earlier image:</strong>
+                            ${earlierFile.name}
+                        </p>
+
+                        <p>
+                            <strong>Later image:</strong>
+                            ${laterFile.name}
+                        </p>
+
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                satelliteChangeResult.innerHTML =
+                    '<span class="error">' +
+                    (error.message || "Change detection failed.") +
+                    "</span>";
+            } finally {
+                satelliteChangeButton.disabled = false;
+            }
+        });
+
+        // ============================================================
+        // ============================================================
+        // SATELLITE GEOGRAPHIC ANALYSIS
+        // ============================================================
+
+        const satelliteGeographyClass =
+            document.getElementById("satellite-geography-class");
+
+        const satelliteGeographyButton =
+            document.getElementById("satellite-geography-button");
+
+        const satelliteGeographyResult =
+            document.getElementById("satellite-geography-result");
+
+        satelliteGeographyButton.addEventListener("click", async () => {
+            const classId = Number(satelliteGeographyClass.value);
+
+            satelliteGeographyButton.disabled = true;
+
+            satelliteGeographyResult.textContent =
+                "Analyzing the selected geographic class...";
+
+            try {
+                const response = await fetch(
+                    "/satellite/user/analyze-geography-real?class_id=" +
+                    encodeURIComponent(classId),
+                    {
+                        method: "POST"
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "Geographic analysis failed."
+                    );
+                }
+
+                satelliteGeographyResult.innerHTML = `
+                    <div class="satellite-result-card">
+                        <strong>
+                            ${data.class_name || "Geographic analysis"}
+                        </strong>
+
+                        <p>
+                            <strong>Detected regions:</strong>
+                            ${data.region_count ?? 0}
+                        </p>
+
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                satelliteGeographyResult.innerHTML =
+                    '<span class="error">' +
+                    (error.message || "Geographic analysis failed.") +
+                    "</span>";
+            } finally {
+                satelliteGeographyButton.disabled = false;
+            }
+        });
+        // SATELLITE AI REASONING
+        // ============================================================
+
+        const satelliteReasoningQuestion =
+            document.getElementById("satellite-reasoning-question");
+
+        const satelliteReasoningButton =
+            document.getElementById("satellite-reasoning-button");
+
+        const satelliteReasoningResult =
+            document.getElementById("satellite-reasoning-result");
+
+        satelliteReasoningButton.addEventListener("click", async () => {
+            const question = satelliteReasoningQuestion.value.trim();
+            const place = satelliteAreaPlace.value.trim();
+
+            if (!place) {
+                satelliteReasoningResult.innerHTML =
+                    '<span class="error">Please enter a place in Explore an Area first.</span>';
+                return;
+            }
+
+            if (!question) {
+                satelliteReasoningResult.innerHTML =
+                    '<span class="error">Please enter a question.</span>';
+                return;
+            }
+
+            satelliteReasoningButton.disabled = true;
+            satelliteReasoningResult.textContent =
+                "AI is analyzing the satellite observations...";
+
+            try {
+                const response = await fetch(
+                    "/satellite/user/ask-area",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            source: place,
+                            question: question
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "Could not obtain a satellite AI answer."
+                    );
+                }
+
+                const answer = data.answer || {};
+                const location = data.location || {};
+
+                satelliteReasoningResult.innerHTML = `
+                    <div class="satellite-result-card">
+                        <strong>Satellite AI answer</strong>
+
+                        <p>
+                            <strong>Area:</strong>
+                            ${data.area?.area_name || place}
+                        </p>
+
+                        <p>
+                            <strong>Location:</strong>
+                            ${Number(location.latitude || 0).toFixed(5)},
+                            ${Number(location.longitude || 0).toFixed(5)}
+                        </p>
+
+                        <p>
+                            <strong>Question:</strong>
+                            ${question}
+                        </p>
+
+                        <p>
+                            <strong>Answer:</strong>
+                            ${
+                                answer.answer ||
+                                "The available satellite observations do not contain enough information to answer this question yet."
+                            }
+                        </p>
+
+                        ${
+                            answer.basis
+                                ? `
+                                    <p>
+                                        <strong>Basis:</strong>
+                                        ${answer.basis}
+                                    </p>
+                                `
+                                : ""
+                        }
+                    </div>
+                `;
+            } catch (error) {
+                satelliteReasoningResult.innerHTML =
+                    '<span class="error">' +
+                    (error.message || "AI reasoning failed.") +
+                    "</span>";
+            } finally {
+                satelliteReasoningButton.disabled = false;
+            }
+        });
+
+        // ============================================================
+        // SATELLITE ROUTE OPTIMIZATION
+        // ============================================================
+
+        const satelliteOptimizationObjective =
+            document.getElementById("satellite-optimization-objective");
+
+        const satelliteOptimizationButton =
+            document.getElementById("satellite-optimization-button");
+
+        const satelliteOptimizationResult =
+            document.getElementById("satellite-optimization-result");
+
+        satelliteOptimizationButton.addEventListener("click", async () => {
+            const objective = satelliteOptimizationObjective.value;
+            const source = routeSource.value.trim();
+            const target = routeTarget.value.trim();
+
+            if (!source || !target) {
+                satelliteOptimizationResult.innerHTML =
+                    '<span class="error">Please enter both a starting place and destination in Route Intelligence first.</span>';
+                return;
+            }
+
+            if (source.toLowerCase() === target.toLowerCase()) {
+                satelliteOptimizationResult.innerHTML =
+                    '<span class="error">Please choose two different places.</span>';
+                return;
+            }
+
+            satelliteOptimizationButton.disabled = true;
+            satelliteOptimizationResult.textContent =
+                "Finding real alternative routes and optimizing them...";
+
+            try {
+                const routeResponse = await fetch(
+                    "/satellite/route-by-place",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            source,
+                            target
+                        })
+                    }
+                );
+
+                const routeData = await routeResponse.json();
+
+                if (!routeResponse.ok) {
+                    throw new Error(
+                        routeData.detail ||
+                        "Could not resolve the route locations."
+                    );
+                }
+
+                const sourceLocation = routeData.source || {};
+                const targetLocation = routeData.target || {};
+
+                if (
+                    typeof sourceLocation.latitude !== "number" ||
+                    typeof sourceLocation.longitude !== "number" ||
+                    typeof targetLocation.latitude !== "number" ||
+                    typeof targetLocation.longitude !== "number"
+                ) {
+                    throw new Error(
+                        "The routing service did not return valid coordinates."
+                    );
+                }
+
+                const optimizationResponse = await fetch(
+                    "/satellite/optimize-route-real",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            source_latitude: sourceLocation.latitude,
+                            source_longitude: sourceLocation.longitude,
+                            target_latitude: targetLocation.latitude,
+                            target_longitude: targetLocation.longitude,
+                            objective,
+                            max_routes: 3,
+                            minimum_difference_edges: 2
+                        })
+                    }
+                );
+
+                const optimizationData =
+                    await optimizationResponse.json();
+
+                if (!optimizationResponse.ok) {
+                    throw new Error(
+                        optimizationData.detail ||
+                        "Real route optimization failed."
+                    );
+                }
+
+                const selected =
+                    optimizationData.selected_route || {};
+                const candidates =
+                    optimizationData.candidates || [];
+
+                const candidateRows = candidates
+                    .map((candidate) => {
+                        const selectedMarker =
+                            candidate.route_id === selected.route_id
+                                ? " <strong>(selected)</strong>"
+                                : "";
+
+                        return `
+                            <li>
+                                <strong>${candidate.route_id}</strong>
+                                ${selectedMarker}
+                                ? ${Number(
+                                    candidate.distance_km || 0
+                                ).toFixed(3)} km
+                            </li>
+                        `;
+                    })
+                    .join("");
+
+                satelliteOptimizationResult.innerHTML = `
+                    <div class="satellite-result-card">
+                        <strong>Real route optimization complete</strong>
+
+                        <p>
+                            <strong>From:</strong>
+                            ${
+                                routeData.source?.display_name ||
+                                source
+                            }
+                        </p>
+
+                        <p>
+                            <strong>To:</strong>
+                            ${
+                                routeData.target?.display_name ||
+                                target
+                            }
+                        </p>
+
+                        <p>
+                            <strong>Objective:</strong>
+                            ${objective}
+                        </p>
+
+                        <p>
+                            <strong>Selected route:</strong>
+                            ${
+                                selected.route_id ||
+                                "N/A"
+                            }
+                        </p>
+
+                        <p>
+                            <strong>Selected distance:</strong>
+                            ${
+                                selected.distance_km !== undefined
+                                    ? Number(
+                                        selected.distance_km
+                                    ).toFixed(3) + " km"
+                                    : "N/A"
+                            }
+                        </p>
+
+                        <p>
+                            <strong>Alternative routes found:</strong>
+                            ${candidates.length}
+                        </p>
+
+                        ${
+                            candidateRows
+                                ? `
+                                    <p>
+                                        <strong>Route candidates:</strong>
+                                    </p>
+                                    <ul>
+                                        ${candidateRows}
+                                    </ul>
+                                `
+                                : ""
+                        }
+
+                        ${
+                            optimizationData.limitations
+                                ? `
+                                    <p>
+                                        <strong>Note:</strong>
+                                        ${optimizationData.limitations}
+                                    </p>
+                                `
+                                : ""
+                        }
+                    </div>
+                `;
+            } catch (error) {
+                satelliteOptimizationResult.innerHTML =
+                    '<span class="error">' +
+                    (error.message ||
+                        "Route optimization failed.") +
+                    "</span>";
+            } finally {
+                satelliteOptimizationButton.disabled = false;
+            }
+        });
+
         // SATELLITE ROUTING
         // ============================================================
 
@@ -928,3 +1929,14 @@
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
